@@ -77,7 +77,7 @@ pkg_setup() {
   #export KV_OUT_DIR=$KBUILD_OUTPUT
   einfo KERNEL_DIR:$KERNEL_DIR KV_DIR:$KV_DIR KBUILD_OUTPUT:$KBUILD_OUTPUT KV_OUT_DIR:$KV_OUT_DIR \
     KV_FULL:$KV_FULL
-
+  tc-export BUILD_PKG_CONFIG
 	linux-mod_pkg_setup
 
 	BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S}"
@@ -148,7 +148,8 @@ src_prepare() {
 	fi
 
 	epatch ${PATCHES[@]}
-
+  #tc-export PKG_CONFIG
+  tc-export BUILD_PKG_CONFIG
 	eapply_user
 }
 
