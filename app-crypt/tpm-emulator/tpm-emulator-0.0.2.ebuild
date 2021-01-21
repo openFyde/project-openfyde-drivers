@@ -25,7 +25,7 @@ RDEPEND="
 "
 
 src_configure() {
-	tc-export CC CXX LD AR RANLIB NM
+	#tc-export CC CXX LD AR RANLIB NM
 	CHROMEOS=1 cmake-utils_src_configure
 }
 
