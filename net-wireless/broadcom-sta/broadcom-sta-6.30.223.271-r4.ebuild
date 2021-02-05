@@ -27,6 +27,7 @@ IUSE_KERNEL_VERS=(
 	kernel-4_14
   kernel-4_19
   kernel-5_4
+  kernel-5_10
 )
 IUSE="${IUSE_KERNEL_VERS[*]}"
 REQUIRED_USE="?? ( ${IUSE_KERNEL_VERS[*]} )"
@@ -53,6 +54,9 @@ pkg_setup() {
   if use kernel-5_4; then
     export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v5.4"
   fi
+  if use kernel-5_10; then
+    export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v5.10"
+  fi
   export KBUILD_OUTPUT=${ROOT}usr/src/linux
 	CONFIG_CHECK="~!B43 ~!BCMA ~!SSB ~!CC_IS_CLANG"
 	CONFIG_CHECK2="LIB80211 ~!MAC80211 ~LIB80211_CRYPT_TKIP"
@@ -77,10 +81,11 @@ pkg_setup() {
   #export KV_OUT_DIR=$KBUILD_OUTPUT
   einfo KERNEL_DIR:$KERNEL_DIR KV_DIR:$KV_DIR KBUILD_OUTPUT:$KBUILD_OUTPUT KV_OUT_DIR:$KV_OUT_DIR \
     KV_FULL:$KV_FULL
-  tc-export BUILD_PKG_CONFIG
+  #tc-export BUILD_PKG_CONFIG
+  tc-export_build_env BUILD_{CC,CXX}
 	linux-mod_pkg_setup
 
-	BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S}"
+	BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S} CC=${CBUILD}-clang"
 	BUILD_TARGETS="wl.ko"
 }
 
@@ -121,6 +126,10 @@ src_prepare() {
     ${FILESDIR}/${PN}-6.30.223.271-r5-linux-5.1.patch
   )
 
+  PATCHES_5_6=(
+    ${FILESDIR}/${PN}-6.30.223.271-r5-linux-5.6.patch
+  )
+#broadcom-sta-6.30.223.271-r4.ebuild
 	PATCHES=("${PATCHES_COMMON[@]}")
 	if use kernel-3_18; then
 		einfo "Applying patches for kernel 3.18"
@@ -146,10 +155,15 @@ src_prepare() {
     einfo "Applying patches for kernel 5.4"
     PATCHES=("${PATCHES[@]}" "${PATCHES_3_18[@]}" "${PATCHES_4_4[@]}" "${PATCHES_4_12[@]}" "${PATCHES_4_14[@]}" "${PATCHES_4_19[@]}" "${PATCHES_5_4[@]}")
 	fi
+  if use kernel-5_10; then
+    einfo "Applying patches for kernel 5.4"
+    PATCHES=("${PATCHES[@]}" "${PATCHES_3_18[@]}" "${PATCHES_4_4[@]}" "${PATCHES_4_12[@]}" "${PATCHES_4_14[@]}" "${PATCHES_4_19[@]}" "${PATCHES_5_4[@]}" "${PATCHES_5_6[@]}")
+  fi
 
 	epatch ${PATCHES[@]}
   #tc-export PKG_CONFIG
-  tc-export BUILD_PKG_CONFIG
+  #tc-export_build_env BUILD_{CC,CXX}
+  #tc-export BUILD_PKG_CONFIG
 	eapply_user
 }
 
