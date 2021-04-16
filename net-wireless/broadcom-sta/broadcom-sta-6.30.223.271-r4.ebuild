@@ -40,6 +40,7 @@ S="${WORKDIR}"
 MODULE_NAMES="wl(net/wireless)"
 MODULESD_WL_ALIASES=("wlan0 wl")
 
+
 pkg_setup() {
 	# bug #300570
 	# NOTE<lxnay>: module builds correctly anyway with b43 and SSB enabled
@@ -124,6 +125,7 @@ src_prepare() {
 
   PATCHES_5_4=(
     ${FILESDIR}/${PN}-6.30.223.271-r5-linux-5.1.patch
+    ${FILESDIR}/${PN}-6.30.223.271-r5-linux-5.4.patch
   )
 
   PATCHES_5_6=(

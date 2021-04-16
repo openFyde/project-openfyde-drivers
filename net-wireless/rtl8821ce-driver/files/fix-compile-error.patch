@@ -1,0 +1,217 @@
+diff --git a/core/rtw_ap.c b/core/rtw_ap.c
+index b89db84..c3d32cd 100644
+--- a/core/rtw_ap.c
++++ b/core/rtw_ap.c
+@@ -4389,7 +4389,7 @@ static u8 rtw_ap_update_chbw_by_ifbmp(struct dvobj_priv *dvobj, u8 ifbmp
+ 	int i;
+ 
+ 	for (i = 0; i < dvobj->iface_nums; i++) {
+-		if (!(ifbmp & BIT(i)) || !dvobj->padapters)
++		if (!(ifbmp & BIT(i)) || !dvobj->padapters[i])
+ 			continue;
+ 
+ 		iface = dvobj->padapters[i];
+@@ -4409,7 +4409,7 @@ static u8 rtw_ap_update_chbw_by_ifbmp(struct dvobj_priv *dvobj, u8 ifbmp
+ 	}
+ 
+ 	for (i = 0; i < dvobj->iface_nums; i++) {
+-		if (!(ifbmp & BIT(i)) || !dvobj->padapters)
++		if (!(ifbmp & BIT(i)) || !dvobj->padapters[i])
+ 			continue;
+ 
+ 		iface = dvobj->padapters[i];
+diff --git a/core/rtw_ieee80211.c b/core/rtw_ieee80211.c
+index 72b75ed..b609605 100644
+--- a/core/rtw_ieee80211.c
++++ b/core/rtw_ieee80211.c
+@@ -2912,3 +2912,20 @@ const char *action_public_str(u8 action)
+ 	return _action_public_str[action];
+ }
+ 
++
++int is_multicast_mac_addr(const u8 *addr)
++{
++  return (addr[0] != 0xff) && (0x01 & addr[0]);
++}
++
++int is_broadcast_mac_addr(const u8 *addr)
++{
++  return ((addr[0] == 0xff) && (addr[1] == 0xff) && (addr[2] == 0xff) &&   \
++    (addr[3] == 0xff) && (addr[4] == 0xff) && (addr[5] == 0xff));
++}
++
++int is_zero_mac_addr(const u8 *addr)
++{
++  return ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) &&   \
++    (addr[3] == 0x00) && (addr[4] == 0x00) && (addr[5] == 0x00));
++}
+diff --git a/core/rtw_mlme_ext.c b/core/rtw_mlme_ext.c
+index cb346ee..e1901ab 100755
+--- a/core/rtw_mlme_ext.c
++++ b/core/rtw_mlme_ext.c
+@@ -9985,10 +9985,10 @@ static int issue_action_ba(_adapter *padapter, unsigned char *raddr, unsigned ch
+ 				psta->BA_starting_seqctrl[tid & 0x07] = start_seq;
+ 
+ 				BA_starting_seqctrl = start_seq << 4;
++			  BA_starting_seqctrl = cpu_to_le16(BA_starting_seqctrl);
++			  pframe = rtw_set_fixed_ie(pframe, 2, (unsigned char *)(&(BA_starting_seqctrl)), &(pattrib->pktlen));
+ 			}
+ 
+-			BA_starting_seqctrl = cpu_to_le16(BA_starting_seqctrl);
+-			pframe = rtw_set_fixed_ie(pframe, 2, (unsigned char *)(&(BA_starting_seqctrl)), &(pattrib->pktlen));
+ 			break;
+ 
+ 		case RTW_WLAN_ACTION_ADDBA_RESP:
+@@ -14999,7 +14999,9 @@ operation_by_state:
+ 
+ #ifdef CONFIG_SCAN_BACKOP
+ 	case SCAN_BACKING_OP: {
+-		u8 back_ch, back_bw, back_ch_offset;
++		u8 back_ch = 0;
++    u8 back_bw = 0;
++    u8 back_ch_offset = 0;
+ 		u8 need_ch_setting_union = _TRUE;
+ 
+ #ifdef CONFIG_MCC_MODE
+diff --git a/core/rtw_security.c b/core/rtw_security.c
+index b537a26..46ba18d 100644
+--- a/core/rtw_security.c
++++ b/core/rtw_security.c
+@@ -1575,7 +1575,7 @@ u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
+ 	pframe = ((struct xmit_frame *)pxmitframe)->buf_addr + hw_hdr_offset;
+ 
+ 	/* 4 start to encrypt each fragment */
+-	if ((pattrib->encrypt == _AES_)) {
++	if (pattrib->encrypt == _AES_) {
+ 		/*
+ 				if(pattrib->psta)
+ 				{
+@@ -1930,7 +1930,7 @@ u32	rtw_aes_decrypt(_adapter *padapter, u8 *precvframe)
+ 	u32	res = _SUCCESS;
+ 	pframe = (unsigned char *)((union recv_frame *)precvframe)->u.hdr.rx_data;
+ 	/* 4 start to encrypt each fragment */
+-	if ((prxattrib->encrypt == _AES_)) {
++	if (prxattrib->encrypt == _AES_) {
+ 
+ 		stainfo = rtw_get_stainfo(&padapter->stapriv , &prxattrib->ta[0]);
+ 		if (stainfo != NULL) {
+diff --git a/hal/hal_dm.c b/hal/hal_dm.c
+index 38a2f3a..0022e4d 100644
+--- a/hal/hal_dm.c
++++ b/hal/hal_dm.c
+@@ -490,7 +490,7 @@ void rtw_hal_turbo_edca(_adapter *adapter)
+ 		return;
+ 	}
+ 
+-	if ((pregpriv->wifi_spec == 1)) { /* || (pmlmeinfo->HT_enable == 0)) */
++	if (pregpriv->wifi_spec == 1) { /* || (pmlmeinfo->HT_enable == 0)) */
+ 		precvpriv->is_any_non_be_pkts = _FALSE;
+ 		return;
+ 	}
+diff --git a/hal/hal_mp.c b/hal/hal_mp.c
+index 1af9de3..f013ed6 100644
+--- a/hal/hal_mp.c
++++ b/hal/hal_mp.c
+@@ -181,7 +181,7 @@ void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, BOOLEAN bInCH14)
+ 	} else if (IS_HARDWARE_TYPE_8723D(Adapter)) {
+ 		/* 2.4G CCK TX DFIR */
+ 		/* 2016.01.20 Suggest from RS BB mingzhi*/
+-		if ((u1Channel == 14)) {
++		if (u1Channel == 14) {
+ 			phy_set_bb_reg(Adapter, rCCK0_TxFilter2, bMaskDWord, 0x0000B81C);
+ 			phy_set_bb_reg(Adapter, rCCK0_DebugPort, bMaskDWord, 0x00000000);
+ 			phy_set_bb_reg(Adapter, 0xAAC, bMaskDWord, 0x00003667);
+diff --git a/hal/phydm/halrf/rtl8821c/halrf_iqk_8821c.c b/hal/phydm/halrf/rtl8821c/halrf_iqk_8821c.c
+index 259f868..57510e5 100644
+--- a/hal/phydm/halrf/rtl8821c/halrf_iqk_8821c.c
++++ b/hal/phydm/halrf/rtl8821c/halrf_iqk_8821c.c
+@@ -1856,7 +1856,7 @@ u32 _txgapk_one_shot_8821c(struct dm_struct *dm_void, u8 path, u32 reg0x56)
+ 	u32 txgap_k_tmp1 = 0x1, txgap_k_tmp2 = 0x2;
+ 	u8 offset;
+ 	u32 reg_1bb8;
+-	u32 rx_dsp_power;
++	u32 rx_dsp_power = 0;
+ 
+ 	reg_1bb8 = odm_read_4byte(dm, 0x1bb8);
+ 	/*clear the flag*/
+diff --git a/hal/phydm/phydm_ccx.c b/hal/phydm/phydm_ccx.c
+index 6a87080..77dc360 100644
+--- a/hal/phydm/phydm_ccx.c
++++ b/hal/phydm/phydm_ccx.c
+@@ -1115,7 +1115,7 @@ void phydm_clm_racing_release(void *dm_void)
+ 	ccx->clm_app = CLM_BACKGROUND;
+ }
+ 
+-u8 phydm_clm_racing_ctrl(void *dm_void, enum phydm_nhm_level clm_lv)
++u8 phydm_clm_racing_ctrl(void *dm_void, enum phydm_clm_level clm_lv)
+ {
+ 	struct dm_struct *dm = (struct dm_struct *)dm_void;
+ 	struct ccx_info *ccx = &dm->dm_ccx_info;
+diff --git a/include/ieee80211.h b/include/ieee80211.h
+index cec9856..a001e7a 100644
+--- a/include/ieee80211.h
++++ b/include/ieee80211.h
+@@ -1584,22 +1584,11 @@ enum ieee80211_state {
+ 	(((Addr[2]) & 0xff) == 0xff) && (((Addr[3]) & 0xff) == 0xff) && (((Addr[4]) & 0xff) == 0xff) && \
+ 				     (((Addr[5]) & 0xff) == 0xff))
+ #else
+-extern __inline int is_multicast_mac_addr(const u8 *addr)
+-{
+-	return (addr[0] != 0xff) && (0x01 & addr[0]);
+-}
+-
+-extern __inline int is_broadcast_mac_addr(const u8 *addr)
+-{
+-	return ((addr[0] == 0xff) && (addr[1] == 0xff) && (addr[2] == 0xff) &&   \
+-		(addr[3] == 0xff) && (addr[4] == 0xff) && (addr[5] == 0xff));
+-}
+-
+-extern __inline int is_zero_mac_addr(const u8 *addr)
+-{
+-	return ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) &&   \
+-		(addr[3] == 0x00) && (addr[4] == 0x00) && (addr[5] == 0x00));
+-}
++extern int is_multicast_mac_addr(const u8 *addr);
++
++extern int is_broadcast_mac_addr(const u8 *addr);
++
++extern int is_zero_mac_addr(const u8 *addr);
+ #endif /* PLATFORM_FREEBSD */
+ 
+ #define CFG_IEEE80211_RESERVE_FCS (1<<0)
+diff --git a/include/rtw_recv.h b/include/rtw_recv.h
+index a17b3b6..fefba3e 100644
+--- a/include/rtw_recv.h
++++ b/include/rtw_recv.h
+@@ -790,7 +790,7 @@ __inline static u8 *recvframe_pull_tail(union recv_frame *precvframe, sint sz)
+ 
+ __inline static _buffer *get_rxbuf_desc(union recv_frame *precvframe)
+ {
+-	_buffer *buf_desc;
++	_buffer *buf_desc = NULL;
+ 
+ 	if (precvframe == NULL)
+ 		return NULL;
+@@ -815,18 +815,19 @@ __inline static union recv_frame *rxmem_to_recvframe(u8 *rxmem)
+ __inline static union recv_frame *pkt_to_recvframe(_pkt *pkt)
+ {
+ 
+-	u8 *buf_star;
+-	union recv_frame *precv_frame;
+ #ifdef PLATFORM_WINDOWS
++	u8 *buf_star = NULL;
++	union recv_frame *precv_frame;
+ 	_buffer *buf_desc;
+ 	uint len;
+ 
+ 	NdisQueryPacket(pkt, NULL, NULL, &buf_desc, &len);
+ 	NdisQueryBufferSafe(buf_desc, &buf_star, &len, HighPagePriority);
+-#endif
+ 	precv_frame = rxmem_to_recvframe((unsigned char *)buf_star);
+ 
+ 	return precv_frame;
++#endif
++  return NULL;
+ }
+ 
+ __inline static u8 *pkt_to_recvmem(_pkt *pkt)
