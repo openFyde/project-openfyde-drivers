@@ -40,6 +40,22 @@ S="${WORKDIR}"
 MODULE_NAMES="wl(net/wireless)"
 MODULESD_WL_ALIASES=("wlan0 wl")
 
+patch_kernel_make() {
+  local patch_file=${FILESDIR}/kernel-5.4-make-gcc-compile.patch
+  local reverse=$1
+  pushd $KERNEL_DIR 2>&1 >/dev/null
+  patch $reverse  -p1 -i $patch_file
+  popd 2>&1 >/dev/null 
+}
+
+apply_kernel_make_patch() {
+  patch_kernel_make "-N"
+}
+
+reverse_kernel_make_patch() {
+  patch_kernel_make "-R -N"
+}
+
 
 pkg_setup() {
 	# bug #300570
@@ -82,11 +98,9 @@ pkg_setup() {
   #export KV_OUT_DIR=$KBUILD_OUTPUT
   einfo KERNEL_DIR:$KERNEL_DIR KV_DIR:$KV_DIR KBUILD_OUTPUT:$KBUILD_OUTPUT KV_OUT_DIR:$KV_OUT_DIR \
     KV_FULL:$KV_FULL
-  #tc-export BUILD_PKG_CONFIG
-  tc-export_build_env BUILD_{CC,CXX}
 	linux-mod_pkg_setup
 
-	BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S} CC=${CBUILD}-clang"
+	BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S} CC=${CBUILD}-gcc"
 	BUILD_TARGETS="wl.ko"
 }
 
@@ -163,14 +177,13 @@ src_prepare() {
   fi
 
 	epatch ${PATCHES[@]}
-  #tc-export PKG_CONFIG
-  #tc-export_build_env BUILD_{CC,CXX}
-  #tc-export BUILD_PKG_CONFIG
+  apply_kernel_make_patch
 	eapply_user
 }
 
 src_install() {
 	linux-mod_src_install
+  reverse_kernel_make_patch
 	rm -f ${ED}/etc/modprobe.d/wl.conf
 
 	dodoc "${DISTDIR}/README-${P}.txt"

@@ -50,6 +50,22 @@ PATCHES=(
   "${FILESDIR}"/fix-compile-error.patch
   )
 
+patch_kernel_make() {
+  local patch_file=${FILESDIR}/kernel-5.4-make-gcc-compile.patch
+  local reverse=$1
+  pushd $KERNEL_DIR 2>&1 >/dev/null
+  patch $reverse  -p1 -i $patch_file
+  popd 2>&1 >/dev/null
+}
+
+apply_kernel_make_patch() {
+  patch_kernel_make "-N"
+}
+
+reverse_kernel_make_patch() {
+  patch_kernel_make "-R -N"
+}
+
 pkg_setup() {
 	export DISTCC_DISABLE=1
 	export CCACHE_DISABLE=1
@@ -77,7 +93,7 @@ pkg_setup() {
 #  export KERNELRELEASE=1
 	MODULE_NAMES="8821ce(net/wireless)"
 
-  BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S} CC=${CBUILD}-clang"
+  BUILD_PARAMS="-C ${KERNEL_DIR} -I${KBUILD_OUTPUT} O=${KBUILD_OUTPUT} M=${S} CC=${CBUILD}-gcc"
 	BUILD_TARGETS="modules"
   einfo KERNELRELEASE:$KERNELRELEASE
   export CONFIG_RTL8821CE=m
@@ -88,6 +104,7 @@ src_prepare() {
 		eerror "You must build this against 4.14.0 or higher kernels."
 	fi
 	default
+  apply_kernel_make_patch
 }
 
 src_compile() {
@@ -96,7 +113,7 @@ src_compile() {
 
 src_install() {
 	linux-mod_src_install
-
+  reverse_kernel_make_patch
 	# Make it load
 	insinto /etc/modules-load.d/
 	doins -r "${FILESDIR}/rtl8821ce.conf"
