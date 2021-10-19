@@ -96,6 +96,7 @@ pkg_setup() {
 		CONFIG_CHECK="${CONFIG_CHECK} IEEE80211 IEEE80211_CRYPT_TKIP"
 	fi
   #export KV_OUT_DIR=$KBUILD_OUTPUT
+  tc-export BUILD_PKG_CONFIG
   einfo KERNEL_DIR:$KERNEL_DIR KV_DIR:$KV_DIR KBUILD_OUTPUT:$KBUILD_OUTPUT KV_OUT_DIR:$KV_OUT_DIR \
     KV_FULL:$KV_FULL
 	linux-mod_pkg_setup
@@ -144,6 +145,7 @@ src_prepare() {
 
   PATCHES_5_6=(
     ${FILESDIR}/${PN}-6.30.223.271-r5-linux-5.6.patch
+    ${FILESDIR}/${PN}-6.30.223.271-r6-linux-5.9.patch
   )
 #broadcom-sta-6.30.223.271-r4.ebuild
 	PATCHES=("${PATCHES_COMMON[@]}")
@@ -182,6 +184,7 @@ src_prepare() {
 }
 
 src_install() {
+  tc-export PKG_CONFIG
 	linux-mod_src_install
   reverse_kernel_make_patch
 	rm -f ${ED}/etc/modprobe.d/wl.conf

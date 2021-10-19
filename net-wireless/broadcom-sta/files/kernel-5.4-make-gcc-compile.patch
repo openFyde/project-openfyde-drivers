@@ -22,3 +22,16 @@ index 90d1a2a1fdcd4..3ae3e80d3e958 100644
  endif
  
  # These warnings generated too much noise in a regular build.
+diff --git a/Makefile b/Makefile
+index 33f62d84c625f..f8146becf3910 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1073,7 +1073,7 @@ mod_sign_cmd = true
+ endif
+ export mod_sign_cmd
+ 
+-HOST_LIBELF_LIBS = $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
++HOST_LIBELF_LIBS = $(shell $(BUILD_PKG_CONFIG) libelf --libs 2>/dev/null || echo -lelf)
+ 
+ has_libelf = $(call try-run,\
+                echo "int main() {}" | $(HOSTCC) -xc -o /dev/null $(HOST_LIBELF_LIBS) -,1,0)
