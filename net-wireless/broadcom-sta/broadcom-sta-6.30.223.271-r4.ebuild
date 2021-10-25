@@ -174,7 +174,7 @@ src_prepare() {
     PATCHES=("${PATCHES[@]}" "${PATCHES_3_18[@]}" "${PATCHES_4_4[@]}" "${PATCHES_4_12[@]}" "${PATCHES_4_14[@]}" "${PATCHES_4_19[@]}" "${PATCHES_5_4[@]}")
 	fi
   if use kernel-5_10; then
-    einfo "Applying patches for kernel 5.4"
+    einfo "Applying patches for kernel 5.10"
     PATCHES=("${PATCHES[@]}" "${PATCHES_3_18[@]}" "${PATCHES_4_4[@]}" "${PATCHES_4_12[@]}" "${PATCHES_4_14[@]}" "${PATCHES_4_19[@]}" "${PATCHES_5_4[@]}" "${PATCHES_5_6[@]}")
   fi
 
