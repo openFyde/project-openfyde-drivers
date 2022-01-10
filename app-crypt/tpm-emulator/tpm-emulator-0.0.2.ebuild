@@ -4,7 +4,7 @@
 
 EAPI="5"
 
-EGIT_REPO_URI="git@gitlab.fydeos.xyz:misc/tpm-emulator.git"
+EGIT_REPO_URI="${FYDEOS_GIT_HOST_BASE_URL}/tpm-emulator.git"
 EGIT_BRANCH="github_master"
 #EGIT_COMMIT="268acb688c41643175bc244decd5bb6fa288c38f"
 
