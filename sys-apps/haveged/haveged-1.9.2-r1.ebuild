@@ -13,6 +13,7 @@ LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS="amd64 arm ~arm64 ~ppc x86"
 IUSE="selinux static-libs"
+RESTRICT="mirror"
 
 DEPEND=""
 RDEPEND="!<sys-apps/openrc-0.11.8

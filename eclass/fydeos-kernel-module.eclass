@@ -10,6 +10,7 @@ IUSE="
   kernel-4_14
   kernel-4_19
   kernel-5_4
+  kernel-5_10
   clang
 "
 
@@ -24,6 +25,9 @@ fydeos-kernel-module_pkg_setup() {
   fi
   if use kernel-5_4; then
     export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v5.4"
+  fi
+  if use kernel-5_10; then
+    export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v5.10"
   fi
 
   export KBUILD_OUTPUT=${ROOT}usr/src/linux
