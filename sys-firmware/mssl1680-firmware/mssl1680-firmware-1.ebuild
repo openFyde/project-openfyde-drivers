@@ -6,7 +6,7 @@
 
 EAPI=5
 
-EGIT_REPO_URI="https://github.com/onitake/gsl-firmware.git"
+EGIT_REPO_URI="https://gitee.com/openFyde/gsl-firmware.git"
 #EGIT_BRANCH="master"
 #EGIT_HAS_SUBMODULES="true"
 #EGIT_NONBARE="true"
