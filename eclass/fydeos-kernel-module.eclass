@@ -1,3 +1,6 @@
+# Copyright (c) 2022 Fyde Innovations Limited and the openFyde Authors.
+# Distributed under the license specified in the root directory of this project.
+
 inherit linux-info linux-mod
 LICENSE="GPL-2"
 SLOT="0"
