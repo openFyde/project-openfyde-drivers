@@ -11,7 +11,7 @@ inherit git-r3 autotools
 DESCRIPTION="Libtpms-based TPM emulator with socket, character device, and Linux CUSE interface."
 HOMEPAGE="https://github.com/stefanberger/swtpm"
 SRC_URI=""
-EGIT_REPO_URI="${OPENFYDE_GIT_HOST_URL}/swtpm_bin.git"
+EGIT_REPO_URI="${OPENFYDE_GIT_HOST_URL}/swtpm-bin.git"
 EGIT_BRANCH="master"
 LICENSE="BSD-Google"
 SLOT="0"
