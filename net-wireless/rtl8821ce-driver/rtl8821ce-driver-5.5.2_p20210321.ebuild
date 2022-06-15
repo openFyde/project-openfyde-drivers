@@ -111,6 +111,7 @@ src_prepare() {
 }
 
 src_compile() {
+	cros_allow_gnu_build_tools
 	linux-mod_src_compile
 }
 
