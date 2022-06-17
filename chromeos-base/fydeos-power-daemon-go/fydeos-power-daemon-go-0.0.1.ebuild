@@ -28,6 +28,7 @@ EGO_PN="fydeos.com/power_daemon"
 
 
 src_compile() {
+   export GO111MODULE=auto
    GOARCH=$ARCH golang-build_src_compile
 }
 get_golibdir() {
