@@ -5,7 +5,7 @@ EAPI="6"
 
 
 EGIT_REPO_URI="${OPENFYDE_GIT_HOST_URL}/fydeos-power-daemon-go.git"
-EGIT_BRANCH="r96"
+EGIT_BRANCH="r108-dev"
 
 inherit git-r3 golang-build
 DESCRIPTION="fydeos power daemon in golang"
@@ -32,7 +32,7 @@ src_compile() {
    GOARCH=$ARCH golang-build_src_compile
 }
 get_golibdir() {
-  echo "/usr/lib/gopath"  
+  echo "/usr/lib/gopath"
 }
 
 src_install() {
