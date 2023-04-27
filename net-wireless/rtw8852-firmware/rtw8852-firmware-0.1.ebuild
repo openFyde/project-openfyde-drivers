@@ -19,6 +19,6 @@ DEPEND="${RDEPEND}"
 S="${WORKDIR}"
 
 src_install() {
-    insinto /lib/firmware/rw89/
+    insinto /lib/firmware/rtw89/
     doins -r ${FILESDIR}/*
 }
