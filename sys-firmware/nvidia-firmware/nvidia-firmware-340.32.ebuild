@@ -4,15 +4,15 @@
 # Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_{9..11} )
 inherit python-any-r1 unpacker
 
 NV_URI="http://us.download.nvidia.com/XFree86/"
 X86_NV_PACKAGE="NVIDIA-Linux-x86-${PV}"
 
-EXTRACT_FIRMWARE_REV="96641bfebb2547402b2145fcf0e3116410f0da87"
+EXTRACT_FIRMWARE_REV="a0b9f9be0efad90cc84b8b2eaf587c3d7d350ea9"
 
 DESCRIPTION="Kernel and mesa firmware for nouveau (video accel and pgraph)"
 HOMEPAGE="https://nouveau.freedesktop.org/wiki/VideoAcceleration/"
