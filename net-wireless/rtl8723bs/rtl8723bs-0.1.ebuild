@@ -29,14 +29,14 @@ DEPEND="${RDEPEND}
 MODULE_NAMES="r8723bs(net/wireless)"
 
 pkg_setup() {
-	linux-mod_pkg_setup
 	BUILD_TARGETS=modules
-    BUILD_PARAMS="KSRC=${KV_OUT_DIR}"
+  BUILD_PARAMS="KSRC=${KV_OUT_DIR}"
+	linux-mod_pkg_setup
 }
 
 src_install() {
 #	ewarn "**** Adding Files to Firmware *****"
-    insinto /lib/firmware/rtlwifi/
-    doins ${S}/rtl8723bs_*.bin
+  insinto /lib/firmware/rtlwifi/
+  doins ${S}/rtl8723bs_*.bin
 	linux-mod_src_install
 }

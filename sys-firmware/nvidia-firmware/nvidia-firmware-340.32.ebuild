@@ -6,7 +6,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{6..11} )
 inherit python-any-r1 unpacker
 
 NV_URI="http://us.download.nvidia.com/XFree86/"
@@ -17,7 +17,7 @@ EXTRACT_FIRMWARE_REV="a0b9f9be0efad90cc84b8b2eaf587c3d7d350ea9"
 DESCRIPTION="Kernel and mesa firmware for nouveau (video accel and pgraph)"
 HOMEPAGE="https://nouveau.freedesktop.org/wiki/VideoAcceleration/"
 SRC_URI="${NV_URI}Linux-x86/${PV}/${X86_NV_PACKAGE}.run
-	https://raw.github.com/imirkin/re-vp2/${EXTRACT_FIRMWARE_REV}/extract_firmware.py -> nvidia_extract_firmware-${PV}.py"
+    https://raw.githubusercontent.com/envytools/firmware/${EXTRACT_FIRMWARE_REV}/extract_firmware.py -> nvidia_extract_firmware-${PV}.py"
 
 LICENSE="MIT NVIDIA-r2"
 SLOT="0"
@@ -38,7 +38,7 @@ src_unpack() {
 }
 
 src_compile() {
-	"${PYTHON}" "${DISTDIR}"/nvidia_extract_firmware-${PV}.py || die "Extracting firmwares failed..."
+	python3.8 "${DISTDIR}"/nvidia_extract_firmware-${PV}.py || die "Extracting firmwares failed..."
 }
 
 src_install() {

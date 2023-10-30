@@ -1,0 +1,1 @@
+ACTION=="add", DRIVERS=="sr", ATTRS{idVendor}=="0bda", RUN+="/usr/bin/eject /dev/$name & echo $name > /tmp/rtl.info"
