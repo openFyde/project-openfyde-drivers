@@ -1,0 +1,33 @@
+diff --git a/Makefile b/Makefile
+index 6d86aa877f36d..983082945f560 100644
+--- a/Makefile
++++ b/Makefile
+@@ -753,7 +753,7 @@ stackp-flags-$(CONFIG_STACKPROTECTOR_STRONG)      := -fstack-protector-strong
+ 
+ KBUILD_CFLAGS += $(stackp-flags-y)
+ 
+-ifdef CONFIG_CC_IS_CLANG
++ifndef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += -Qunused-arguments
+ KBUILD_CFLAGS += -Wno-format-invalid-specifier
+ # The kernel builds with '-std=gnu11' so use of GNU extensions is acceptable.
+@@ -769,7 +769,9 @@ else
+ # Warn about unmarked fall-throughs in switch statement.
+ # Disabled for clang while comment to attribute conversion happens and
+ # https://github.com/ClangBuiltLinux/linux/issues/636 is discussed.
+-KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough,)
++#KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough,)
++#KBUILD_CFLAGS += -Wno-gnu-variable-sized-type-not-at-end
++KBUILD_CFLAGS += -Wno-implicit-fallthrough
+ endif
+ 
+ # These warnings generated too much noise in a regular build.
+@@ -885,7 +887,7 @@ endif
+ KBUILD_CFLAGS += -Wdeclaration-after-statement
+ 
+ # Variable Length Arrays (VLAs) should not be used anywhere in the kernel
+-KBUILD_CFLAGS += -Wvla
++KBUILD_CFLAGS += -Wno-vla
+ 
+ # disable pointer signed / unsigned warnings in gcc 4.0
+ KBUILD_CFLAGS += -Wno-pointer-sign

@@ -1,0 +1,1 @@
+rtl8192fu-driver-0.0.1.ebuild

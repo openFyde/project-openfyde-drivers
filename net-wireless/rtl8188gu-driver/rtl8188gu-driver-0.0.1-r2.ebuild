@@ -1,0 +1,1 @@
+rtl8188gu-driver-0.0.1.ebuild
