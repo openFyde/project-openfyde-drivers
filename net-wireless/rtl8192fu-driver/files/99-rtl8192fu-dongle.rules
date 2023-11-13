@@ -1,1 +1,1 @@
-ACTION=="add", DRIVERS=="sr", ATTRS{idVendor}=="0bda", RUN+="/usr/bin/eject /dev/$name & echo $name > /tmp/rtl.info"
+ACTION=="add", DRIVER=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="a192", RUN+="/lib/udev/eject.sh"

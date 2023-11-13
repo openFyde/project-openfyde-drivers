@@ -26,4 +26,6 @@ src_install() {
   gcc-linux-mod_src_install
   insinto /lib/udev/rules.d
   doins ${FILESDIR}/99-rtl8192fu-dongle.rules
+  exeinto /lib/udev
+  doexe ${FILESDIR}/eject.sh
 }
