@@ -24,6 +24,7 @@ src_prepare() {
   if use arm; then
     append-cflags -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
   fi
+  default
 }
 
 src_install() {
