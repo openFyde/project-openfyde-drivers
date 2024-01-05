@@ -4,7 +4,7 @@
 # Copyright 2017 The Chromium OS Authors. All rights reserved.
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
 CROS_WORKON_COMMIT=("1d5a43761ee445bc067735ce4ad8799031f22a8b" "a8dcf5a266cf359310a6837317279dfa3f17d993")
 CROS_WORKON_TREE=("6589055d0d41e7fc58d42616ba5075408d810f7d" "c69560a1105f45db22ca6621b8a65e55d1b39695" "310a710d6c1f02a93504b35b3d8371875f253b6a")

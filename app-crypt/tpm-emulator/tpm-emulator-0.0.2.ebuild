@@ -5,7 +5,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header$
 
-EAPI="5"
+EAPI=7
 
 EGIT_REPO_URI="${OPENFYDE_GIT_HOST_URL}/tpm-emulator.git"
 EGIT_BRANCH="github_master"

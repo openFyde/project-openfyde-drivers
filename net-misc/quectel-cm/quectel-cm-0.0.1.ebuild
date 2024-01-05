@@ -1,7 +1,7 @@
 # Copyright (c) 2018 The Fyde OS Authors. All rights reserved.
 # Distributed under the terms of the BSD
 
-EAPI="5"
+EAPI=7
 
 EGIT_REPO_URI="git@gitlab.fydeos.xyz:misc/quectel-cm.git"
 EGIT_COMMIT="53e4a3a135dda98398c10ca44f84be8aca98d28e"

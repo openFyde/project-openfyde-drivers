@@ -1,7 +1,7 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="7"
+EAPI=7
 
 DESCRIPTION="tool to manipulate Intel X86 and X86-64 processor microcode update collections"
 HOMEPAGE="https://gitlab.com/iucode-tool/"

@@ -2,7 +2,7 @@
 # Distributed under the license specified in the root directory of this project.
 
 
-EAPI=5
+EAPI=7
 
 DESCRIPTION="rtw8852 firmware files"
 

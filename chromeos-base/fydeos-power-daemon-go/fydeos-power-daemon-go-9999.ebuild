@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Fyde Innovations Limited and the openFyde Authors.
 # Distributed under the license specified in the root directory of this project.
 
-EAPI="6"
+EAPI=7
 
 CROS_WORKON_PROJECT="chromiumos/third_party/fydeos-power-daemon"
 #CROS_WORKON_LOCALNAME="fydeos-power-daemon"

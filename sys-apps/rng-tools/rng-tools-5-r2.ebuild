@@ -4,7 +4,7 @@
 # Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
 inherit eutils autotools systemd toolchain-funcs
 
@@ -26,6 +26,7 @@ RDEPEND="${DEPEND}
 	selinux? ( sec-policy/selinux-rngd )"
 
 src_prepare() {
+  default
 	echo 'bin_PROGRAMS = randstat' >> contrib/Makefile.am || die
 	epatch "${FILESDIR}"/test-for-argp.patch
 	epatch "${FILESDIR}"/${P}-fix-textrels-on-PIC-x86.patch #469962

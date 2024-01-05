@@ -4,7 +4,7 @@
 # Copyright 2017 The Chromium OS Authors. All rights reserved.
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 CROS_WORKON_COMMIT="56fe2d9e10a1ec883eab1183caf5ec1cb8eb5aee"
 CROS_WORKON_TREE="f9a0ff98f3cd24122211efa283390ddc059ab607"
 CROS_WORKON_PROJECT="chromiumos/platform/arc-camera"
