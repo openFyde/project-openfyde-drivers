@@ -5,7 +5,7 @@ EAPI=7
 
 
 EGIT_REPO_URI="${OPENFYDE_GIT_HOST_URL}/fydeos-power-daemon-go.git"
-EGIT_BRANCH="r108-dev"
+EGIT_BRANCH="r126-dev"
 
 inherit git-r3 golang-build
 DESCRIPTION="fydeos power daemon in golang"
