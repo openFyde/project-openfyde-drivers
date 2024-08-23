@@ -45,3 +45,7 @@ src_install() {
   exeinto /usr/sbin
   doexe power_daemon
 }
+
+PATCHES=(
+  ${FILESDIR}/001-fix-location-of-system_api.patch
+)
