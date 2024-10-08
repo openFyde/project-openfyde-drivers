@@ -14,6 +14,8 @@ IUSE="
   kernel-4_19
   kernel-5_4
   kernel-5_10
+  kernel-5_15
+  kernel-6_6
   clang
 "
 
@@ -32,9 +34,15 @@ fydeos-kernel-module_pkg_setup() {
   if use kernel-5_10; then
     export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v5.10"
   fi
+  if use kernel-5_15; then
+    export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v5.15"
+  fi
+  if use kernel-6_6; then
+    export KERNEL_DIR="/mnt/host/source/src/third_party/kernel/v6.6"
+  fi
 
   export KBUILD_OUTPUT=${ROOT}usr/src/linux
-  export KV_OUT_DIR=${ROOT}usr/src/linux 
+  export KV_OUT_DIR=${ROOT}usr/src/linux
   einfo KBUILD_OUTPUT:$KBUILD_OUTPUT
   local makefile=${KV_OUT_DIR}/Makefile
   if [ -z "$(cat $makefile| grep ${KERNEL_DIR})" ]; then

@@ -16,6 +16,7 @@ IUSE_KERNEL_VERS=(
   kernel-5_4
   kernel-5_10
   kernel-5_15
+  kernel-6_6
 )
 
 IUSE="${IUSE_KERNEL_VERS[*]}"
@@ -67,6 +68,8 @@ get_makefile_patch() {
     echo "${_KERNEL_PATCH_PATH}/Makefile_5_15.patch"
   elif use kernel-5_15; then
     echo "${_KERNEL_PATCH_PATH}/Makefile_5_15.patch"
+  elif use kernel-6_6; then
+    echo "${_KERNEL_PATCH_PATH}/Makefile_6_6.patch"
   fi
 }
 
@@ -79,6 +82,8 @@ get_kernel_source() {
     echo "${_KERNEL_DIR}/v5.10"
   elif use kernel-5_15; then
     echo "${_KERNEL_DIR}/v5.15"
+  elif use kernel-6_6; then
+    echo "${_KERNEL_DIR}/v6.6"
   fi
 }
 
