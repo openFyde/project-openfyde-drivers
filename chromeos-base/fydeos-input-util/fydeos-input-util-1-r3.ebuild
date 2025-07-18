@@ -10,7 +10,7 @@ DESCRIPTION="Script to configure input devices for FydeOS"
 HOMEPAGE="http://flintos.io"
 
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 x86 arm64"
 LICENSE="GPL-3"
 
 IUSE="psmouse_imps"
