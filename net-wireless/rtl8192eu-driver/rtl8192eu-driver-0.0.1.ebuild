@@ -6,9 +6,9 @@
 
 EAPI=7
 
-inherit gcc-linux-mod
+inherit clang-linux-mod
 
-COMMIT="0e435c95029ac445eadc656e6a41d2d4d20ce054"
+COMMIT="ee928d5dc065f328043711c271eb54f008e6245c"
 
 DESCRIPTION="ReatlTek 8192eu wifi driver"
 HOMEPAGE="https://github.com/clnhub/rtl8192eu-linux"
@@ -21,3 +21,5 @@ KEYWORDS="amd64 arm64"
 MODULE_NAMES="8192eu(net/wireless)"
 MODULE_CONFIGS="CONFIG_RTL8192EU"
 S="${WORKDIR}/rtl8192eu-linux-${COMMIT}"
+
+PATCHES=( ${FILESDIR}/001-adapt-to-kernel-6_6.patch )

@@ -6,7 +6,7 @@
 
 EAPI=7
 
-inherit gcc-linux-mod
+inherit clang-linux-mod
 
 COMMIT="78bbe0258d227174eb6e4594b42c32c357cd3cf6"
 
@@ -23,9 +23,11 @@ MODULE_CONFIGS="CONFIG_RTL8192FU"
 S="${WORKDIR}/rtl8192fu-${COMMIT}"
 
 src_install() {
-  gcc-linux-mod_src_install
+  linux-mod_src_install
   insinto /lib/udev/rules.d
   doins ${FILESDIR}/99-rtl8192fu-dongle.rules
   exeinto /lib/udev
   doexe ${FILESDIR}/eject.sh
 }
+
+PATCHES=( ${FILESDIR}/fix-compiling-issue.patch )

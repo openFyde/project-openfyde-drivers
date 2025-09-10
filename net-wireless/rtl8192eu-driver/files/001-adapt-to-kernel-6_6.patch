@@ -1,0 +1,123 @@
+diff --git a/Makefile b/Makefile
+index 451e415..93fcfec 100755
+--- a/Makefile
++++ b/Makefile
+@@ -6,20 +6,44 @@ ccflags-y += -O1
+ #ccflags-y += -pedantic
+ #ccflags-y += -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes
+ ccflags-y += -Wmissing-prototypes
+-ccflags-y += -Werror=missing-prototypes
++#ccflags-y += -Werror=missing-prototypes
+ 
+ ccflags-y += -Wno-unused-variable
+-#ccflags-y += -Wno-unused-value
+-#ccflags-y += -Wno-unused-label
+-#ccflags-y += -Wno-unused-parameter
+-#ccflags-y += -Wno-unused-function
++ccflags-y += -Wno-unused-function
++ccflags-y += -Wno-misleading-indentation
++ccflags-y += -Wno-unused-value
++ccflags-y += -Wno-unused-label
++ccflags-y += -Wno-unused-parameter
++ccflags-y += -Wno-implicit-fallthrough
++ccflags-y += -Wno-enum-conversion
++ccflags-y += -Wno-vla
++ccflags-y += -Wno-error
+ #ccflags-y += -Wno-unused
+ #ccflags-y += -Wno-uninitialized
+ 
++# Support for both GCC and Clang compilers
++ifeq ($(CC),clang)
++ccflags-y += -Wno-date-time
++ccflags-y += -Wno-gnu-variable-sized-type-not-at-end
++ccflags-y += -Wno-tautological-compare
++ccflags-y += -Wno-missing-field-initializers
++ccflags-y += -Wno-unused-const-variable
++ccflags-y += -Wno-format-security
++ccflags-y += -Wno-initializer-overrides
++ccflags-y += -Wno-uninitialized
++ccflags-y += -Wno-unknown-pragmas
++ccflags-y += -Wno-pragma-pack
++ccflags-y += -Wno-cast-function-type
++ccflags-y += -Wno-parentheses-equality
++ccflags-y += -Wno-undefined-internal
++ccflags-y += -Wno-unused-but-set-variable
++ccflags-y += -Wno-address-of-packed-member
++else
+ GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | `which bc` )
+ ifeq ($(GCC_VER_49),1)
+ ccflags-y += -Wno-date-time	# Fix compile error && warning on gcc 4.9 and later
+ endif
++endif
+ 
+ ccflags-y += -I$(src)/include
+ 
+@@ -1330,8 +1354,8 @@ ccflags-y += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
+ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/)
+ ARCH ?= $(SUBARCH)
+ CROSS_COMPILE ?=
+-KVER  := $(shell uname -r)
+-KSRC := /lib/modules/$(KVER)/build
++KVER  ?= $(shell uname -r)
++KSRC ?= /lib/modules/$(KVER)/build
+ MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
+ INSTALL_PREFIX :=
+ STAGINGMODDIR := /lib/modules/$(KVER)/kernel/drivers/staging
+diff --git a/include/rtl8192e_sreset.h b/include/rtl8192e_sreset.h
+index 78109ae..6e6aa27 100644
+--- a/include/rtl8192e_sreset.h
++++ b/include/rtl8192e_sreset.h
+@@ -12,8 +12,8 @@
+  * more details.
+  *
+  *****************************************************************************/
+-#ifndef _RTL88812A_SRESET_H_
+-#define _RTL8812A_SRESET_H_
++#ifndef _RTL8192E_SRESET_H_
++#define _RTL8192E_SRESET_H_
+ 
+ #include <rtw_sreset.h>
+ 
+diff --git a/include/rtl8812a_sreset.h b/include/rtl8812a_sreset.h
+index d4bbd58..13cbf5f 100644
+--- a/include/rtl8812a_sreset.h
++++ b/include/rtl8812a_sreset.h
+@@ -12,7 +12,7 @@
+  * more details.
+  *
+  *****************************************************************************/
+-#ifndef _RTL88812A_SRESET_H_
++#ifndef _RTL8812A_SRESET_H_
+ #define _RTL8812A_SRESET_H_
+ 
+ #include <rtw_sreset.h>
+diff --git a/include/rtw_mlme_ext.h b/include/rtw_mlme_ext.h
+index 57777e5..6f92b0b 100755
+--- a/include/rtw_mlme_ext.h
++++ b/include/rtw_mlme_ext.h
+@@ -273,7 +273,7 @@ enum TDLS_option {
+ #if defined(CONFIG_ATMEL_RC_PATCH)
+ 	#define RTW_SCAN_NUM_OF_CH 2
+ 	#define RTW_BACK_OP_CH_MS 200
+-#elseif defined(CONFIG_CUSTOMER_EZVIZ_CHIME2)
++#elif defined(CONFIG_CUSTOMER_EZVIZ_CHIME2)
+ 	#define RTW_SCAN_NUM_OF_CH 1
+ 	#define RTW_BACK_OP_CH_MS 200
+ #else
+diff --git a/include/rtw_recv.h b/include/rtw_recv.h
+index aa99a10..b49dee1 100644
+--- a/include/rtw_recv.h
++++ b/include/rtw_recv.h
+@@ -778,10 +778,9 @@ __inline static union recv_frame *rxmem_to_recvframe(u8 *rxmem)
+ 
+ __inline static union recv_frame *pkt_to_recvframe(_pkt *pkt)
+ {
+-
+-	u8 *buf_star;
++	/* extract the recv_frame from _pkt */
+ 	union recv_frame *precv_frame;
+-	precv_frame = rxmem_to_recvframe((unsigned char *)buf_star);
++	precv_frame = rxmem_to_recvframe((unsigned char *)pkt);
+ 
+ 	return precv_frame;
+ }

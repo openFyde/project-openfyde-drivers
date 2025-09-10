@@ -1,0 +1,118 @@
+diff --git a/Makefile b/Makefile
+index a2b9ff7..779fc6e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -15,16 +15,30 @@ EXTRA_CFLAGS += -Wno-unused-parameter
+ EXTRA_CFLAGS += -Wno-unused-function
+ EXTRA_CFLAGS += -Wno-unused
+ EXTRA_CFLAGS += -Wno-implicit-fallthrough
+-EXTRA_CFLAGS += -Wno-discarded-qualifiers
+ EXTRA_CFLAGS += -Wno-cast-function-type
+ EXTRA_CFLAGS += -Wno-address
+ #EXTRA_CFLAGS += -Wno-uninitialized
+ 
++# Compiler detection
++IS_CLANG := $(shell $(CC) --version 2>/dev/null | grep -q clang && echo 1 || echo 0)
++
+ GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | bc )
+ ifeq ($(GCC_VER_49),1)
+ EXTRA_CFLAGS += -Wno-date-time	# Fix compile error && warning on gcc 4.9 and later
+ endif
+ 
++# Clang-specific flags
++ifeq ($(IS_CLANG),1)
++EXTRA_CFLAGS += -Wno-enum-conversion
++EXTRA_CFLAGS += -Wno-missing-braces
++EXTRA_CFLAGS += -Wno-sometimes-uninitialized
++EXTRA_CFLAGS += -Wno-tautological-pointer-compare
++EXTRA_CFLAGS += -Wno-incompatible-pointer-types-discards-qualifiers
++EXTRA_CFLAGS += -Wno-strict-prototypes
++else
++EXTRA_CFLAGS += -Wno-discarded-qualifiers
++endif
++
+ EXTRA_CFLAGS += -I$(src)/include
+ 
+ EXTRA_LDFLAGS += --strip-debug
+diff --git a/hal/efuse/rtl8192f/HalEfuseMask8192F_PCIE.c b/hal/efuse/rtl8192f/HalEfuseMask8192F_PCIE.c
+index fefc5c5..306f08c 100644
+--- a/hal/efuse/rtl8192f/HalEfuseMask8192F_PCIE.c
++++ b/hal/efuse/rtl8192f/HalEfuseMask8192F_PCIE.c
+@@ -58,7 +58,7 @@ u8 Array_MP_8192F_MPCIE[] = {
+ 		0x00,
+ };
+ 
+-u16 EFUSE_GetArrayLen_MP_8192F_MPCIE()
++u16 EFUSE_GetArrayLen_MP_8192F_MPCIE(void)
+ {
+ 	return sizeof(Array_MP_8192F_MPCIE)/sizeof(u8);
+ }
+diff --git a/hal/efuse/rtl8192f/HalEfuseMask8192F_SDIO.c b/hal/efuse/rtl8192f/HalEfuseMask8192F_SDIO.c
+index 1937817..0aec5fe 100644
+--- a/hal/efuse/rtl8192f/HalEfuseMask8192F_SDIO.c
++++ b/hal/efuse/rtl8192f/HalEfuseMask8192F_SDIO.c
+@@ -58,7 +58,7 @@ u8 Array_MP_8192F_MSDIO[] = {
+ 		0x00,
+ };
+ 
+-u16 EFUSE_GetArrayLen_MP_8192F_MSDIO()
++u16 EFUSE_GetArrayLen_MP_8192F_MSDIO(void)
+ {
+ 	return sizeof(Array_MP_8192F_MSDIO)/sizeof(u8);
+ }
+diff --git a/hal/efuse/rtl8192f/HalEfuseMask8192F_USB.c b/hal/efuse/rtl8192f/HalEfuseMask8192F_USB.c
+index f61b17e..9ba91c3 100644
+--- a/hal/efuse/rtl8192f/HalEfuseMask8192F_USB.c
++++ b/hal/efuse/rtl8192f/HalEfuseMask8192F_USB.c
+@@ -58,7 +58,7 @@ u8 Array_MP_8192F_MUSB[] = {
+ 		0x10,
+ };
+ 
+-u16 EFUSE_GetArrayLen_MP_8192F_MUSB()
++u16 EFUSE_GetArrayLen_MP_8192F_MUSB(void)
+ {
+ 	return sizeof(Array_MP_8192F_MUSB)/sizeof(u8);
+ }
+diff --git a/include/ieee80211.h b/include/ieee80211.h
+index 1a31b84..c9d844c 100644
+--- a/include/ieee80211.h
++++ b/include/ieee80211.h
+@@ -1451,18 +1451,18 @@ enum ieee80211_state {
+ 	(((Addr[2]) & 0xff) == 0xff) && (((Addr[3]) & 0xff) == 0xff) && (((Addr[4]) & 0xff) == 0xff) && \
+ 				     (((Addr[5]) & 0xff) == 0xff))
+ #else
+-extern inline int is_multicast_mac_addr(const u8 *addr)
++static inline int is_multicast_mac_addr(const u8 *addr)
+ {
+ 	return (addr[0] != 0xff) && (0x01 & addr[0]);
+ }
+ 
+-extern inline int is_broadcast_mac_addr(const u8 *addr)
++static inline int is_broadcast_mac_addr(const u8 *addr)
+ {
+ 	return ((addr[0] == 0xff) && (addr[1] == 0xff) && (addr[2] == 0xff) &&   \
+ 		(addr[3] == 0xff) && (addr[4] == 0xff) && (addr[5] == 0xff));
+ }
+ 
+-extern inline int is_zero_mac_addr(const u8 *addr)
++static inline int is_zero_mac_addr(const u8 *addr)
+ {
+ 	return ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) &&   \
+ 		(addr[3] == 0x00) && (addr[4] == 0x00) && (addr[5] == 0x00));
+diff --git a/include/rtw_recv.h b/include/rtw_recv.h
+index 90abfee..bcca605 100644
+--- a/include/rtw_recv.h
++++ b/include/rtw_recv.h
+@@ -767,9 +767,11 @@ __inline static union recv_frame *rxmem_to_recvframe(u8 *rxmem)
+ 
+ __inline static union recv_frame *pkt_to_recvframe(_pkt *pkt)
+ {
+-
+ 	u8 *buf_star;
+ 	union recv_frame *precv_frame;
++	
++	/* Extract data buffer from packet */
++	buf_star = pkt->data;
+ 	precv_frame = rxmem_to_recvframe((unsigned char *)buf_star);
+ 
+ 	return precv_frame;

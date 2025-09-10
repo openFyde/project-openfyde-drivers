@@ -6,7 +6,7 @@
 
 EAPI=7
 
-inherit gcc-linux-mod
+inherit clang-linux-mod
 
 COMMIT="c2b79fc1c085d9fc4a70ac0f5bc730ec929c562b"
 
@@ -21,3 +21,5 @@ KEYWORDS="amd64 arm64"
 MODULE_NAMES="8188gu(net/wireless)"
 MODULE_CONFIGS="CONFIG_RTL8710BU"
 S="${WORKDIR}/rtl8188gu-${COMMIT}"
+
+PATCHES=( ${FILESDIR}/001-update-to-kernel-6_6.patch )
