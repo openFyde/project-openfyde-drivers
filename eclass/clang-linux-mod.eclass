@@ -10,7 +10,7 @@
 
 if [[ -z ${_GCC_LINUX_MOD_ECLASS} ]]; then
 _GCC_LINUX_MOD_ECLASS=1
-inherit linux-mod
+inherit linux-mod cros-toolchain-funcs
 
 IUSE_KERNEL_VERS=(
   kernel-5_4
