@@ -1,0 +1,16 @@
+Index: b/xattr.c
+===================================================================
+--- a/xattr.c
++++ b/xattr.c
+@@ -392,7 +392,11 @@ static int apfs_xattr_get(struct inode *
+ 
+ static int apfs_xattr_osx_get(const struct xattr_handler *handler,
+ 				struct dentry *unused, struct inode *inode,
++#ifdef XATTR_NOSECURITY
++				const char *name, void *buffer, size_t size, int flags)
++#else
+ 				const char *name, void *buffer, size_t size)
++#endif
+ {
+ 	/* Ignore the fake 'osx' prefix */
+ 	return apfs_xattr_get(inode, name, buffer, size);

@@ -22,4 +22,4 @@ MODULE_NAMES="8188gu(net/wireless)"
 MODULE_CONFIGS="CONFIG_RTL8710BU"
 S="${WORKDIR}/rtl8188gu-${COMMIT}"
 
-PATCHES=( ${FILESDIR}/001-update-to-kernel-6_6.patch )
+PATCHES=( ${FILESDIR}/001-update-to-kernel-6_12.patch )

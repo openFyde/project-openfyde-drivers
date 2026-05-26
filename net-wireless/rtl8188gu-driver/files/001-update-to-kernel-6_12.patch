@@ -1,0 +1,138 @@
+diff --git a/Makefile b/Makefile
+index fb07213..d1e7e94 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,6 +16,11 @@ EXTRA_CFLAGS += -Wno-unused
+ EXTRA_CFLAGS += -Wno-cast-function-type
+ #EXTRA_CFLAGS += -Wno-uninitialized
+ EXTRA_CFLAGS += -Wno-implicit-fallthrough
++# Linux 6.9+ enables -Wmissing-prototypes/-Wmissing-declarations by default and
++# CONFIG_WERROR turns them into errors; this old vendor tree has many globals
++# without prototypes, so silence the class instead of touching every file.
++EXTRA_CFLAGS += -Wno-missing-prototypes
++EXTRA_CFLAGS += -Wno-missing-declarations
+ 
+ GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | bc )
+ ifeq ($(GCC_VER_49),1)
+diff --git a/hal/phydm/halrf/halrf_features.h b/hal/phydm/halrf/halrf_features.h
+index e119adc..3a3503e 100644
+--- a/hal/phydm/halrf/halrf_features.h
++++ b/hal/phydm/halrf/halrf_features.h
+@@ -14,7 +14,7 @@
+  *****************************************************************************/
+ 
+ #ifndef	__HALRF_FEATURES_H__
+-#define __HALRF_FEATURES
++#define __HALRF_FEATURES_H__
+ 
+ #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+ 
+diff --git a/hal/phydm/halrf/halrf_kfree.h b/hal/phydm/halrf/halrf_kfree.h
+index f6772e0..1ce7de2 100644
+--- a/hal/phydm/halrf/halrf_kfree.h
++++ b/hal/phydm/halrf/halrf_kfree.h
+@@ -15,7 +15,7 @@
+ 
+ 
+ #ifndef	__PHYDMKFREE_H__
+-#define    __PHYDKFREE_H__
++#define    __PHYDMKFREE_H__
+ 
+ #define KFREE_VERSION	"1.0"
+ 
+diff --git a/hal/phydm/phydm_features.h b/hal/phydm/phydm_features.h
+index 2932582..6ac9ba4 100644
+--- a/hal/phydm/phydm_features.h
++++ b/hal/phydm/phydm_features.h
+@@ -14,7 +14,7 @@
+  *****************************************************************************/
+ 
+ #ifndef	__PHYDM_FEATURES_H__
+-#define __PHYDM_FEATURES
++#define __PHYDM_FEATURES_H__
+ 
+ #define ODM_DC_CANCELLATION_SUPPORT		(ODM_RTL8188F | ODM_RTL8710B)
+ #define ODM_RECEIVER_BLOCKING_SUPPORT	(ODM_RTL8188E | ODM_RTL8192E)
+diff --git a/hal/phydm/phydm_features_ce.h b/hal/phydm/phydm_features_ce.h
+index d606df7..f8c287a 100644
+--- a/hal/phydm/phydm_features_ce.h
++++ b/hal/phydm/phydm_features_ce.h
+@@ -14,7 +14,7 @@
+  *****************************************************************************/
+ 
+ #ifndef	__PHYDM_FEATURES_CE_H__
+-#define __PHYDM_FEATURES_CE
++#define __PHYDM_FEATURES_CE_H__
+ 
+ #if (RTL8822B_SUPPORT == 1)
+ 	/*#define PHYDM_PHYSTAUS_SMP_MODE*/
+diff --git a/include/rtw_recv.h b/include/rtw_recv.h
+index d8009a7..8613d91 100644
+--- a/include/rtw_recv.h
++++ b/include/rtw_recv.h
+@@ -777,7 +777,7 @@ __inline static u8 *recvframe_pull_tail(union recv_frame *precvframe, sint sz)
+ 
+ __inline static _buffer *get_rxbuf_desc(union recv_frame *precvframe)
+ {
+-	_buffer *buf_desc;
++	_buffer *buf_desc = NULL;
+ 
+ 	if (precvframe == NULL)
+ 		return NULL;
+@@ -802,7 +802,7 @@ __inline static union recv_frame *rxmem_to_recvframe(u8 *rxmem)
+ __inline static union recv_frame *pkt_to_recvframe(_pkt *pkt)
+ {
+ 
+-	u8 *buf_star;
++	u8 *buf_star = NULL;
+ 	union recv_frame *precv_frame;
+ #ifdef PLATFORM_WINDOWS
+ 	_buffer *buf_desc;
+diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
+index 61ca863..fdadff6 100644
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -394,6 +394,10 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8
+ 		goto exit;
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 2)
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0)
++	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0)
++	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0, 0);
+ #else
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
+ #endif
+@@ -4461,11 +4465,19 @@ static int cfg80211_rtw_start_ap(struct wiphy *wiphy, struct net_device *ndev,
+ 	return ret;
+ }
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0))
++static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *ndev,
++		struct cfg80211_ap_update *info_update)
++#else
+ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *ndev,
+ 		struct cfg80211_beacon_data *info)
++#endif
+ {
+ 	int ret = 0;
+ 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0))
++	struct cfg80211_beacon_data *info = &info_update->beacon;
++#endif
+ 
+ 	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+diff --git a/os_dep/linux/usb_intf.c b/os_dep/linux/usb_intf.c
+index 705c084..58785b5 100644
+--- a/os_dep/linux/usb_intf.c
++++ b/os_dep/linux/usb_intf.c
+@@ -316,7 +316,7 @@ struct rtw_usb_drv usb_drv = {
+ 	.usbdrv.supports_autosuspend = 1,
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 19))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 19)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0))
+ 	.usbdrv.drvwrap.driver.shutdown = rtw_dev_shutdown,
+ #else
+ 	.usbdrv.driver.shutdown = rtw_dev_shutdown,

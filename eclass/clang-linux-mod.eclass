@@ -17,6 +17,7 @@ IUSE_KERNEL_VERS=(
   kernel-5_10
   kernel-5_15
   kernel-6_6
+  kernel-6_12
 )
 
 IUSE="${IUSE_KERNEL_VERS[*]} +clang asan"
@@ -69,6 +70,8 @@ get_kernel_source() {
     echo "${_KERNEL_DIR}/v5.15"
   elif use kernel-6_6; then
     echo "${_KERNEL_DIR}/v6.6"
+  elif use kernel-6_12; then
+    echo "${_KERNEL_DIR}/v6.12"
   fi
 }
 
