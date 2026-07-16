@@ -20,4 +20,8 @@ S=${FILESDIR}
 src_install() {
   insinto /lib/firmware
   doins -r *
+  # sys-kernel/linux-firmware ships these two as .bin.xz and the kernels
+  # decompress via FW_LOADER_COMPRESS_XZ; don't install plain duplicates.
+  rm "${D}/lib/firmware/mediatek/WIFI_MT7961_patch_mcu_1_2_hdr.bin" \
+     "${D}/lib/firmware/mediatek/WIFI_RAM_CODE_MT7961_1.bin" || die
 }
